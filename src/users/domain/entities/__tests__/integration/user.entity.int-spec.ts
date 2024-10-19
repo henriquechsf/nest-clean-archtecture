@@ -18,5 +18,19 @@ describe('UserEntity integration tests', () => {
       props = { ...UserDataBuilder({}), name: 10 as any }
       expect(() => new UserEntity(props)).toThrow(EntityValidationError)
     })
+
+    it('should throw an error when creating a user with invalid email', () => {
+      let props = { ...UserDataBuilder({}), email: null }
+      expect(() => new UserEntity(props)).toThrow(EntityValidationError)
+
+      props = { ...UserDataBuilder({}), email: '' }
+      expect(() => new UserEntity(props)).toThrow(EntityValidationError)
+
+      props = { ...UserDataBuilder({}), email: 'a'.repeat(256) }
+      expect(() => new UserEntity(props)).toThrow(EntityValidationError)
+
+      props = { ...UserDataBuilder({}), email: 10 as any }
+      expect(() => new UserEntity(props)).toThrow(EntityValidationError)
+    })
   })
 })
