@@ -1,7 +1,7 @@
-import { SearchParams } from "../../searchable-repository-contracts";
+import { SearchParams, SearchResult } from "../../searchable-repository-contracts";
 
 describe('Searchable Repository - unit -tests', () => {
-  describe('Searchable tests', () => {
+  describe('SearchParams tests', () => {
     it('page props', () => {
       const sut = new SearchParams()
       expect(sut.page).toBe(1)
@@ -127,6 +127,65 @@ describe('Searchable Repository - unit -tests', () => {
       params.forEach(param => {
         expect(new SearchParams({ filter: param.filter as any}).filter).toBe(param.expected)
       })
+    });
+  });
+
+  describe('SearchResult tests', () => {
+    it('constructor props', () => {
+      const searchParams = {
+        items: ['test1', 'test2', 'test3', 'test4'] as any,
+        total: 4,
+        currentPage: 1,
+        perPage: 2,
+        sort: null,
+        sortDir: null,
+        filter: null
+      }
+
+      let sut = new SearchResult(searchParams)
+
+      expect(sut.toJson()).toStrictEqual({
+        ...searchParams,
+        lastPage: 2
+      })
+
+      sut = new SearchResult({
+        ...searchParams,
+        sort: 'name',
+        sortDir: 'asc',
+        filter: 'test'
+      })
+
+      expect(sut.toJson()).toStrictEqual({
+        ...searchParams,
+        lastPage: 2,
+        sort: 'name',
+        sortDir: 'asc',
+        filter: 'test'
+      })
+
+      sut = new SearchResult({
+        ...searchParams,
+        total: 4,
+        perPage: 10,
+        sort: 'name',
+        sortDir: 'asc',
+        filter: 'test'
+      })
+
+      expect(sut.lastPage).toBe(1)
+
+      sut = new SearchResult({
+        ...searchParams,
+        total: 54,
+        currentPage: 1,
+        perPage: 10,
+        sort: 'name',
+        sortDir: 'asc',
+        filter: 'test'
+      })
+
+      expect(sut.lastPage).toBe(6)
     });
   });
 });
