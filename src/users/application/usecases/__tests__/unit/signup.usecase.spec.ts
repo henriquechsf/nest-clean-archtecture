@@ -7,7 +7,7 @@ import { UserDataBuilder } from "@/users/domain/entities/testing/helpers/user-da
 import { ConflictError } from "@/shared/domain/errors/conflict-error";
 import { BadRequestError } from "@/users/application/errors/bad-request-error";
 
-describe('Name of the group', () => {
+describe('SignupUseCase unit tests', () => {
   let sut: SignupUseCase.UseCase
   let repository: UserRepository.Repository
   let hashProvider: HashProvider
