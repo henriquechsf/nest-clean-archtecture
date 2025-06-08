@@ -1,8 +1,9 @@
 import { UserRepository } from "@/users/domain/repositories/user.repository"
-import { BadRequestError } from "../errors/bad-request-error"
 import { UserEntity } from "@/users/domain/entities/user.entity"
 import { HashProvider } from "@/shared/application/providers/hash-provider"
 import { UserOutput } from "../dtos/user-output"
+import { UseCase as DefaultUseCase } from "@/shared/application/usecases/use-case"
+import { BadRequestError } from "@/shared/application/errors/bad-request-error"
 
 export namespace SignupUseCase {
 
@@ -14,7 +15,7 @@ export namespace SignupUseCase {
 
   export type Output = UserOutput
 
-  export class UseCase {
+  export class UseCase implements DefaultUseCase<Input, Output> {
     constructor(
       private userRepository: UserRepository.Repository,
       private hashProvider: HashProvider

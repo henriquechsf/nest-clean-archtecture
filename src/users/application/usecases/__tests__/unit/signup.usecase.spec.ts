@@ -5,7 +5,7 @@ import { UserRepository } from "@/users/domain/repositories/user.repository";
 import { BcryptjsHashProvider } from "@/shared/infrastructure/providers/hash-providers/bcryptjs-hash.provider";
 import { UserDataBuilder } from "@/users/domain/entities/testing/helpers/user-data-builder";
 import { ConflictError } from "@/shared/domain/errors/conflict-error";
-import { BadRequestError } from "@/users/application/errors/bad-request-error";
+import { BadRequestError } from "@/shared/application/errors/bad-request-error";
 
 describe('SignupUseCase unit tests', () => {
   let sut: SignupUseCase.UseCase
