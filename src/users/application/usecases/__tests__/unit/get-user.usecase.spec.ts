@@ -21,19 +21,19 @@ describe('GetUserUseCase unit tests', () => {
   });
 
   it('should be able to get user profile', async () => {
-    const spyFindById = jest.spyOn(repository, 'findById')
-    const items = [new UserEntity(UserDataBuilder({}))]
-    repository.items = items
+    const spyFindById = jest.spyOn(repository, 'findById');
+    const items = [new UserEntity(UserDataBuilder({}))];
+    repository.items = items;
 
-    const result = await sut.execute({ id: items[0].id })
+    const result = await sut.execute({ id: items[0].id });
 
-    expect(spyFindById).toHaveBeenCalledTimes(1)
+    expect(spyFindById).toHaveBeenCalledTimes(1);
     expect(result).toMatchObject({
       id: items[0].id,
       name: items[0].name,
       email: items[0].email,
       password: items[0].password,
-      createdAt: items[0].createdAt
-    })
+      createdAt: items[0].createdAt,
+    });
   });
 });
