@@ -12,18 +12,18 @@ import {
   Query,
   Put,
 } from '@nestjs/common';
-import { SignUpDto } from './dtos/signup.dto';
-import { UpdateUserDto } from './dtos/update-user.dto';
-import { SignupUseCase } from '../application/usecases/signup.usecase';
-import { SigninUseCase } from '../application/usecases/signin.usecase';
-import { UpdatePasswordUseCase } from '../application/usecases/update-password.usecase';
-import { UpdateUserUseCase } from '../application/usecases/update-user.usecase';
-import { GetUserUseCase } from '../application/usecases/get-user.usecase';
-import { ListUsersUseCase } from '../application/usecases/list-users.usecase';
-import { DeleteUserUseCase } from '../application/usecases/delete-user.usecase';
-import { SignInDto } from './dtos/signin.dto';
-import { ListUsersDto } from './dtos/list-users.dto';
-import { UpdatePasswordDto } from './dtos/update-password.dto';
+import { SignUpDto } from '../dtos/signup.dto';
+import { UpdateUserDto } from '../dtos/update-user.dto';
+import { SignupUseCase } from '../../application/usecases/signup.usecase';
+import { SigninUseCase } from '../../application/usecases/signin.usecase';
+import { UpdatePasswordUseCase } from '../../application/usecases/update-password.usecase';
+import { UpdateUserUseCase } from '../../application/usecases/update-user.usecase';
+import { GetUserUseCase } from '../../application/usecases/get-user.usecase';
+import { ListUsersUseCase } from '../../application/usecases/list-users.usecase';
+import { DeleteUserUseCase } from '../../application/usecases/delete-user.usecase';
+import { SignInDto } from '../dtos/signin.dto';
+import { ListUsersDto } from '../dtos/list-users.dto';
+import { UpdatePasswordDto } from '../dtos/update-password.dto';
 
 @Controller('users')
 export class UsersController {
