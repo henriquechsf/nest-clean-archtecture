@@ -1,5 +1,6 @@
 import { UsersController } from '../../users.controller';
 import { UserOutput } from '@/users/application/dtos/user-output';
+import { DeleteUserUseCase } from '@/users/application/usecases/delete-user.usecase';
 import { SigninUseCase } from '@/users/application/usecases/signin.usecase';
 import { SignupUseCase } from '@/users/application/usecases/signup.usecase';
 import { UpdatePasswordUseCase } from '@/users/application/usecases/update-password.usecase';
@@ -110,5 +111,19 @@ describe('UsersController - unit tests', () => {
       id,
       ...input,
     });
+  });
+
+  it('should delete an user', async () => {
+    const output = undefined;
+    const mockDeleteUserUseCase = {
+      execute: jest.fn().mockResolvedValue(output),
+    };
+    sut['deleteUserUseCase'] = mockDeleteUserUseCase as any;
+
+    const result = await sut.remove(id);
+
+    expect(result).toStrictEqual(output);
+    expect(mockDeleteUserUseCase.execute).toHaveBeenCalledTimes(1);
+    expect(mockDeleteUserUseCase.execute).toHaveBeenCalledWith({ id });
   });
 });
