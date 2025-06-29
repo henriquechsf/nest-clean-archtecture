@@ -18,6 +18,11 @@ export class UserPrismaRepository implements UserRepository.Repository {
     await this.prismaService.user.create({ data: entity.toJson() });
   }
 
+  async findAll(): Promise<UserEntity[]> {
+    const models = this.prismaService.user.findMany();
+    return (await models).map(model => UserModelMapper.toEntity(model))
+  }
+
   findByEmail(email: string): Promise<UserEntity> {
     throw new Error('Method not implemented.');
   }
@@ -35,10 +40,6 @@ export class UserPrismaRepository implements UserRepository.Repository {
   search(
     props: UserRepository.SearchParams,
   ): Promise<UserRepository.SearchResult> {
-    throw new Error('Method not implemented.');
-  }
-
-  findAll(): Promise<UserEntity[]> {
     throw new Error('Method not implemented.');
   }
 
