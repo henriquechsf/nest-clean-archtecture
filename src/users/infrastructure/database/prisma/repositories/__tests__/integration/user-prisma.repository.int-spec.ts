@@ -189,4 +189,29 @@ describe('UserPrismaRepository integration tests', () => {
       expect(output.name).toBe('new name');
     });
   });
+
+  describe('delete method tests', () => {
+    it('should throws error on delete when entity not fount', async () => {
+      const entity = new UserEntity(UserDataBuilder({}));
+
+      expect(() => sut.delete(entity.id)).rejects.toThrow(
+        new NotFoundError(`User with id ${entity.id} not found`),
+      );
+    });
+
+    it('should delete an entity', async () => {
+      const entity = new UserEntity(UserDataBuilder({}));
+      await prismaService.user.create({
+        data: entity.toJson(),
+      });
+
+      await sut.delete(entity.id);
+
+      const output = await prismaService.user.findUnique({
+        where: { id: entity._id, email: entity.email } as Prisma.UserWhereUniqueInput,
+      });
+
+      expect(output).toBeNull();
+    });
+  });
 });

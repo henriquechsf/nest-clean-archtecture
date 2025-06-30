@@ -77,6 +77,13 @@ export class UserPrismaRepository implements UserRepository.Repository {
     });
   }
 
+  async delete(id: string): Promise<void> {
+    const model = await this._get(id);
+    await this.prismaService.user.delete({
+      where: { id, email: model.email } as Prisma.UserWhereUniqueInput
+    })
+  }
+
   findByEmail(email: string): Promise<UserEntity> {
     throw new Error('Method not implemented.');
   }
@@ -89,10 +96,6 @@ export class UserPrismaRepository implements UserRepository.Repository {
     if (entity) {
       throw new ConflictError('Email address already used');
     }
-  }
-
-  delete(id: string): Promise<void> {
-    throw new Error('Method not implemented.');
   }
 
   protected async _get(id: string): Promise<UserEntity> {
