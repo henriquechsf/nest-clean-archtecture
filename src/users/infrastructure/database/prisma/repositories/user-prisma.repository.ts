@@ -4,6 +4,7 @@ import { UserEntity } from '@/users/domain/entities/user.entity';
 import { UserRepository } from '@/users/domain/repositories/user.repository';
 import { UserModelMapper } from '../models/user-model.mapper';
 import { ConflictError } from '@/shared/domain/errors/conflict-error';
+import { Prisma } from '@prisma/client';
 
 export class UserPrismaRepository implements UserRepository.Repository {
   sortableFields: string[] = ['name', 'createdAt'];
@@ -68,6 +69,14 @@ export class UserPrismaRepository implements UserRepository.Repository {
     });
   }
 
+  async update(entity: UserEntity): Promise<void> {
+    await this._get(entity._id);
+    await this.prismaService.user.update({
+      where: { id: entity._id, email: entity.email } as Prisma.UserWhereUniqueInput,
+      data: entity.toJson(),
+    });
+  }
+
   findByEmail(email: string): Promise<UserEntity> {
     throw new Error('Method not implemented.');
   }
@@ -80,10 +89,6 @@ export class UserPrismaRepository implements UserRepository.Repository {
     if (entity) {
       throw new ConflictError('Email address already used');
     }
-  }
-
-  update(entity: UserEntity): Promise<void> {
-    throw new Error('Method not implemented.');
   }
 
   delete(id: string): Promise<void> {
