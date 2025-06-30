@@ -84,16 +84,24 @@ export class UserPrismaRepository implements UserRepository.Repository {
     })
   }
 
-  findByEmail(email: string): Promise<UserEntity> {
-    throw new Error('Method not implemented.');
+  async findByEmail(email: string): Promise<UserEntity> {
+    try {
+      const user = await this.prismaService.user.findUniqueOrThrow({
+        where: { email },
+      });
+
+      return UserModelMapper.toEntity(user);
+    } catch {
+      throw new NotFoundError(`User with id ${email} not found`);
+    }
   }
 
   async emailExists(email: string): Promise<void> {
-    const entity = await this.prismaService.user.findFirst({
+    const model = await this.prismaService.user.findUnique({
       where: { email },
     });
 
-    if (entity) {
+    if (model) {
       throw new ConflictError('Email address already used');
     }
   }
