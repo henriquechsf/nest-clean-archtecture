@@ -30,7 +30,7 @@ describe('AppController', () => {
     }).compile();
 
     app = module.createNestApplication();
-    applyGlobalConfig(app)
+    applyGlobalConfig(app);
     await app.init();
 
     repository = module.get<UserRepository.Repository>('UserRepository');
@@ -54,11 +54,29 @@ describe('AppController', () => {
 
       expect(Object.keys(res.body)).toStrictEqual(['data']);
 
-      const user = await repository.findById(res.body.data.id)
-      const presenter = UsersController.userToResponse(user.toJson())
-      const serialized = instanceToPlain(presenter)
+      const user = await repository.findById(res.body.data.id);
+      const presenter = UsersController.userToResponse(user.toJson());
+      const serialized = instanceToPlain(presenter);
 
-      expect(res.body.data).toStrictEqual(serialized)
+      expect(res.body.data).toStrictEqual(serialized);
+    });
+
+    it('should return an error with 422 code when the request is invalid', async () => {
+      const res = await request(app.getHttpServer())
+        .post('/users')
+        .send({})
+        .expect(422);
+
+      expect(res.body.error).toBe('Unprocessable Entity');
+      expect(res.body.message).toEqual([
+        'name should not be empty',
+        'name must be a string',
+        'email must be an email',
+        'email should not be empty',
+        'email must be a string',
+        'password should not be empty',
+        'password must be a string',
+      ]);
     });
   });
 });
