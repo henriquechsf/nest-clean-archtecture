@@ -10,6 +10,7 @@ import { PrismaClient } from '@prisma/client';
 import request from 'supertest';
 import { UsersController } from '../../users.controller';
 import { instanceToPlain } from 'class-transformer';
+import { applyGlobalConfig } from '@/global-config';
 
 describe('AppController', () => {
   let app: INestApplication;
@@ -29,6 +30,7 @@ describe('AppController', () => {
     }).compile();
 
     app = module.createNestApplication();
+    applyGlobalConfig(app)
     await app.init();
 
     repository = module.get<UserRepository.Repository>('UserRepository');
