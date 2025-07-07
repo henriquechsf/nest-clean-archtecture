@@ -11,6 +11,8 @@ import request from 'supertest';
 import { UsersController } from '../../users.controller';
 import { instanceToPlain } from 'class-transformer';
 import { applyGlobalConfig } from '@/global-config';
+import { UserEntity } from '@/users/domain/entities/user.entity';
+import { UserDataBuilder } from '@/users/domain/entities/testing/helpers/user-data-builder';
 
 describe('AppController', () => {
   let app: INestApplication;
@@ -130,10 +132,24 @@ describe('AppController', () => {
         .post('/users')
         .send(Object.assign(signupDto, { xpto: 'fake' }))
         .expect(422);
-      console.log(res.body);
 
       expect(res.body.error).toBe('Unprocessable Entity');
       expect(res.body.message).toEqual(['property xpto should not exist']);
+    });
+
+    it('should return an error with 409 code when the email is duplicated', async () => {
+      const entity = new UserEntity(UserDataBuilder({ ...signupDto }));
+      await repository.insert(entity);
+
+      await request(app.getHttpServer())
+        .post('/users')
+        .send(signupDto)
+        .expect(409)
+        .expect({
+          statusCode: 409,
+          error: 'Conflict',
+          message: 'Email address already used',
+        });
     });
   });
 });
