@@ -38,6 +38,10 @@ describe('AppController', () => {
     repository = module.get<UserRepository.Repository>('UserRepository');
   });
 
+  afterAll(async() => {
+    await module.close()
+  })
+
   beforeEach(async () => {
     signupDto = {
       name: 'test name',
