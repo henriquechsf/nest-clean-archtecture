@@ -2,7 +2,6 @@ import { DatabaseModule } from '@/shared/infrastructure/database/database.module
 import { setupPrismaTests } from '@/shared/infrastructure/database/prisma/testing/setup-prisma-tests';
 import { EnvConfigModule } from '@/shared/infrastructure/env-config/env-config.module';
 import { UserRepository } from '@/users/domain/repositories/user.repository';
-import { SignUpDto } from '@/users/infrastructure/dtos/signup.dto';
 import { UsersModule } from '@/users/infrastructure/users.module';
 import { INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
@@ -13,13 +12,15 @@ import { instanceToPlain } from 'class-transformer';
 import { applyGlobalConfig } from '@/global-config';
 import { UserEntity } from '@/users/domain/entities/user.entity';
 import { UserDataBuilder } from '@/users/domain/entities/testing/helpers/user-data-builder';
+import { UpdateUserDto } from '@/users/infrastructure/dtos/update-user.dto';
 
 describe('UsersController - e2e tests', () => {
   let app: INestApplication;
   let module: TestingModule;
   let repository: UserRepository.Repository;
-  let signupDto: SignUpDto;
+  let updateUserDto: UpdateUserDto;
   const prismaService = new PrismaClient();
+  let entity: UserEntity;
 
   beforeAll(async () => {
     setupPrismaTests();
@@ -38,29 +39,31 @@ describe('UsersController - e2e tests', () => {
     repository = module.get<UserRepository.Repository>('UserRepository');
   });
 
-  afterAll(async() => {
-    await module.close()
-  })
-
-  beforeEach(async () => {
-    signupDto = {
-      name: 'test name',
-      email: 'a@a.com',
-      password: 'TestPassword123',
-    };
-    await prismaService.user.deleteMany();
+  afterAll(async () => {
+    await module.close();
   });
 
-  describe('POST /users', () => {
-    it('should create an user', async () => {
+  beforeEach(async () => {
+    updateUserDto = {
+      name: 'test name',
+    };
+    await prismaService.user.deleteMany();
+    entity = new UserEntity(UserDataBuilder({}));
+    await repository.insert(entity);
+  });
+
+  describe('PUT /users', () => {
+    it('should update an user', async () => {
+      updateUserDto.name = 'test name';
       const res = await request(app.getHttpServer())
-        .post('/users')
-        .send(signupDto)
-        .expect(201);
+        .put(`/users/${entity.id}`)
+        .send(updateUserDto)
+        .expect(200);
 
       expect(Object.keys(res.body)).toStrictEqual(['data']);
 
-      const user = await repository.findById(res.body.data.id);
+      const user = await repository.findById(entity.id);
+
       const presenter = UsersController.userToResponse(user.toJson());
       const serialized = instanceToPlain(presenter);
 
@@ -69,7 +72,7 @@ describe('UsersController - e2e tests', () => {
 
     it('should return an error with 422 code when the request is invalid', async () => {
       const res = await request(app.getHttpServer())
-        .post('/users')
+        .put(`/users/${entity.id}`)
         .send({})
         .expect(422);
 
@@ -77,20 +80,15 @@ describe('UsersController - e2e tests', () => {
       expect(res.body.message).toEqual([
         'name should not be empty',
         'name must be a string',
-        'email must be an email',
-        'email should not be empty',
-        'email must be a string',
-        'password should not be empty',
-        'password must be a string',
       ]);
     });
 
     it('should return an error with 422 code when the name field is invalid', async () => {
-      delete signupDto.name;
+      delete updateUserDto.name;
 
       const res = await request(app.getHttpServer())
-        .post('/users')
-        .send(signupDto)
+        .put(`/users/${entity.id}`)
+        .send(updateUserDto)
         .expect(422);
 
       expect(res.body.error).toBe('Unprocessable Entity');
@@ -100,60 +98,26 @@ describe('UsersController - e2e tests', () => {
       ]);
     });
 
-    it('should return an error with 422 code when the email field is invalid', async () => {
-      delete signupDto.email;
-
+    it('should return an error with 404 code when throw NotFoundError with invalid id', async () => {
       const res = await request(app.getHttpServer())
-        .post('/users')
-        .send(signupDto)
-        .expect(422);
-
-      expect(res.body.error).toBe('Unprocessable Entity');
-      expect(res.body.message).toEqual([
-        'email must be an email',
-        'email should not be empty',
-        'email must be a string',
-      ]);
-    });
-
-    it('should return an error with 422 code when the password field is invalid', async () => {
-      delete signupDto.password;
-
-      const res = await request(app.getHttpServer())
-        .post('/users')
-        .send(signupDto)
-        .expect(422);
-
-      expect(res.body.error).toBe('Unprocessable Entity');
-      expect(res.body.message).toEqual([
-        'password should not be empty',
-        'password must be a string',
-      ]);
+        .put(`/users/fakeid`)
+        .send(updateUserDto)
+        .expect(404)
+        .expect({
+          statusCode: 404,
+          error: 'Not Found',
+          message: 'User with id fakeid not found',
+        });
     });
 
     it('should return an error with 422 with invalid field provided', async () => {
       const res = await request(app.getHttpServer())
-        .post('/users')
-        .send(Object.assign(signupDto, { xpto: 'fake' }))
+        .put(`/users/${entity.id}`)
+        .send(Object.assign(updateUserDto, { xpto: 'fake' }))
         .expect(422);
 
       expect(res.body.error).toBe('Unprocessable Entity');
       expect(res.body.message).toEqual(['property xpto should not exist']);
-    });
-
-    it('should return an error with 409 code when the email is duplicated', async () => {
-      const entity = new UserEntity(UserDataBuilder({ ...signupDto }));
-      await repository.insert(entity);
-
-      await request(app.getHttpServer())
-        .post('/users')
-        .send(signupDto)
-        .expect(409)
-        .expect({
-          statusCode: 409,
-          error: 'Conflict',
-          message: 'Email address already used',
-        });
     });
   });
 });

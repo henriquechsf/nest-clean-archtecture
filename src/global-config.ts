@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import { WrapperDataInterceptor } from './shared/infrastructure/interceptors/wrapper-data/wrapper-data.interceptor';
 import { ConflictErrorFilter } from './shared/infrastructure/exception-filters/conflict-error/conflict-error.filter';
+import { NotFoundErrorFilter } from './shared/infrastructure/exception-filters/conflict-error/not-found-error.filter';
 
 export function applyGlobalConfig(app: INestApplication) {
   app.useGlobalPipes(
@@ -23,5 +24,5 @@ export function applyGlobalConfig(app: INestApplication) {
     new ClassSerializerInterceptor(app.get(Reflector)),
   );
 
-  app.useGlobalFilters(new ConflictErrorFilter())
+  app.useGlobalFilters(new ConflictErrorFilter(), new NotFoundErrorFilter());
 }
