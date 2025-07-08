@@ -27,13 +27,10 @@ describe('NotFoundErrorFilter', () => {
   });
 
   it('should catch a NotFoundError', async () => {
-    await request(app.getHttpServer())
-      .get('/stub')
-      .expect(404)
-      .expect({
-        statusCode: 404,
-        error: 'Not Found',
-        message: 'User model not found',
-      });
+    await request(app.getHttpServer()).get('/stub').expect(404).expect({
+      statusCode: 404,
+      error: 'Not Found',
+      message: 'User model not found',
+    });
   });
 });
