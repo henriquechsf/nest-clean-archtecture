@@ -1,18 +1,18 @@
 import { Controller, Get, INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import { ConflictErrorFilter } from '../../conflict-error.filter';
-import { ConflictError } from '@/shared/domain/errors/conflict-error';
 import request from 'supertest';
+import { NotFoundError } from '@/shared/domain/errors/not-found-error';
+import { NotFoundErrorFilter } from '../../not-found-error.filter';
 
 @Controller('stub')
 class StubController {
   @Get()
   index() {
-    throw new ConflictError('Conflicting data');
+    throw new NotFoundError('User model not found');
   }
 }
 
-describe('ConflictErrorFilter', () => {
+describe('NotFoundErrorFilter', () => {
   let app: INestApplication;
   let module: TestingModule;
 
@@ -22,22 +22,18 @@ describe('ConflictErrorFilter', () => {
     }).compile();
 
     app = module.createNestApplication();
-    app.useGlobalFilters(new ConflictErrorFilter());
+    app.useGlobalFilters(new NotFoundErrorFilter());
     await app.init();
   });
 
-  afterAll(async () => {
-    await module.close();
-  });
-
-  it('should catch a ConflictError', async () => {
-    const res = await request(app.getHttpServer())
+  it('should catch a NotFoundError', async () => {
+    await request(app.getHttpServer())
       .get('/stub')
-      .expect(409)
+      .expect(404)
       .expect({
-        statusCode: 409,
-        error: 'Conflict',
-        message: 'Conflicting data',
+        statusCode: 404,
+        error: 'Not Found',
+        message: 'User model not found',
       });
   });
 });

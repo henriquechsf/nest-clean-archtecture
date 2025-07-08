@@ -26,12 +26,8 @@ describe('ConflictErrorFilter', () => {
     await app.init();
   });
 
-  afterAll(async () => {
-    await module.close();
-  });
-
   it('should catch a ConflictError', async () => {
-    const res = await request(app.getHttpServer())
+    await request(app.getHttpServer())
       .get('/stub')
       .expect(409)
       .expect({
