@@ -37,12 +37,12 @@ describe('UsersController - e2e tests', () => {
     await app.init();
 
     repository = module.get<UserRepository.Repository>('UserRepository');
-    hashProvider = new BcryptjsHashProvider()
+    hashProvider = new BcryptjsHashProvider();
   });
 
-  afterAll(async() => {
-    await module.close()
-  })
+  afterAll(async () => {
+    await module.close();
+  });
 
   beforeEach(async () => {
     signinDto = {
@@ -54,12 +54,14 @@ describe('UsersController - e2e tests', () => {
 
   describe('POST /users/login', () => {
     it('should authenticate an user', async () => {
-      const passwordHash = await hashProvider.generateHash(signinDto.password)
-      const entity = new UserEntity(UserDataBuilder({
-        email: signinDto.email,
-        password: passwordHash,
-      }))
-      await repository.insert(entity)
+      const passwordHash = await hashProvider.generateHash(signinDto.password);
+      const entity = new UserEntity(
+        UserDataBuilder({
+          email: signinDto.email,
+          password: passwordHash,
+        }),
+      );
+      await repository.insert(entity);
 
       const res = await request(app.getHttpServer())
         .post('/users/login')
@@ -127,19 +129,25 @@ describe('UsersController - e2e tests', () => {
       expect(res.body.message).toEqual('User with id b@b.com not found');
     });
 
-    // it('should return an error with 409 code when the email is duplicated', async () => {
-    //   const entity = new UserEntity(UserDataBuilder({ ...signupDto }));
-    //   await repository.insert(entity);
+    it('should return an error with 400 when password is incorrect', async () => {
+      const passwordHash = await hashProvider.generateHash(signinDto.password);
+      const entity = new UserEntity(
+        UserDataBuilder({
+          email: signinDto.email,
+          password: passwordHash,
+        }),
+      );
+      await repository.insert(entity);
 
-    //   await request(app.getHttpServer())
-    //     .post('/users')
-    //     .send(signupDto)
-    //     .expect(409)
-    //     .expect({
-    //       statusCode: 409,
-    //       error: 'Conflict',
-    //       message: 'Email address already used',
-    //     });
-    // });
+      const res = await request(app.getHttpServer())
+        .post('/users/login')
+        .send({ email: signinDto.email, password: 'fake' })
+        .expect(400)
+        .expect({
+          statusCode: 400,
+          error: 'Bad Request',
+          message: 'Invalid credentials',
+        });
+    });
   });
 });
