@@ -44,10 +44,6 @@ describe('UsersController - e2e tests', () => {
     hashPassword = await hashProvider.generateHash('1234');
   });
 
-  afterAll(async () => {
-    await module.close();
-  });
-
   beforeEach(async () => {
     await prismaService.user.deleteMany();
     entity = new UserEntity(
