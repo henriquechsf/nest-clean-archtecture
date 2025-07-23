@@ -22,6 +22,8 @@
     "migrate:dev": "npx dotenv-cli -e .env.development -- npx prisma migrate dev --schema ./src/shared/infrastructure/database/prisma/schema.prisma"
   },
   "dependencies": {
+    "@fastify/swagger": "^8.15.0",
+    "@fastify/swagger-ui": "^1.10.2",
     "@nestjs/common": "^10.0.0",
     "@nestjs/config": "^3.2.3",
     "@nestjs/core": "^10.0.0",
@@ -29,6 +31,7 @@
     "@nestjs/mapped-types": "*",
     "@nestjs/platform-express": "^10.0.0",
     "@nestjs/platform-fastify": "^10.4.5",
+    "@nestjs/swagger": "^7.4.2",
     "@prisma/client": "^6.10.1",
     "bcryptjs": "^3.0.2",
     "class-transformer": "^0.5.1",
