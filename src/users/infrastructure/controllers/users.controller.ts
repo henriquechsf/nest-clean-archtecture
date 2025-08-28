@@ -228,6 +228,19 @@ export class UsersController {
     return UsersController.userToResponse(output);
   }
 
+  @ApiBearerAuth()
+  @ApiResponse({
+    status: HttpStatus.NO_CONTENT,
+    description: 'Resposta de confirmacao da exclusao',
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'ID nao encontrado',
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Acesso nao autorizado',
+  })
   @UseGuards(AuthGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   @Delete(':id')
