@@ -32,7 +32,14 @@ import {
 } from '../presenters/user.presenter';
 import { AuthService } from '@/auth/infrastructure/auth.service';
 import { AuthGuard } from '@/auth/infrastructure/auth.guard';
+import {
+  ApiBearerAuth,
+  ApiResponse,
+  ApiTags,
+  getSchemaPath,
+} from '@nestjs/swagger';
 
+@ApiTags('users')
 @Controller('users')
 export class UsersController {
   @Inject(SignupUseCase.UseCase)
@@ -80,6 +87,44 @@ export class UsersController {
     return this.authService.generateJwt(output.id);
   }
 
+  @ApiBearerAuth()
+  @ApiResponse({
+    status: HttpStatus.OK,
+    schema: {
+      type: 'object',
+      properties: {
+        meta: {
+          type: 'object',
+          properties: {
+            total: {
+              type: 'number',
+            },
+            currentPage: {
+              type: 'number',
+            },
+            lastPage: {
+              type: 'number',
+            },
+            perPage: {
+              type: 'number',
+            },
+          },
+        },
+        data: {
+          type: 'array',
+          items: { $ref: getSchemaPath(UserPresenter) },
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.UNPROCESSABLE_ENTITY,
+    description: 'Paramentros de consulta invalidos',
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Acesso nao autorizado',
+  })
   @UseGuards(AuthGuard)
   @Get()
   async search(@Query() searchParams: ListUsersDto) {
