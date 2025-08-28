@@ -202,6 +202,19 @@ export class UsersController {
     return UsersController.userToResponse(output);
   }
 
+  @ApiBearerAuth()
+  @ApiResponse({
+    status: HttpStatus.UNPROCESSABLE_ENTITY,
+    description: 'Corpo da requisicao com dados invalidos',
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'ID nao encontrado',
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Acesso nao autorizado',
+  })
   @UseGuards(AuthGuard)
   @Patch(':id')
   async updatePassword(
