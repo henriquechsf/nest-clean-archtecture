@@ -94,10 +94,10 @@ export class UsersController {
       type: 'object',
       properties: {
         accessToken: {
-          type: 'string'
-        }
-      }
-    }
+          type: 'string',
+        },
+      },
+    },
   })
   @ApiResponse({
     status: HttpStatus.UNPROCESSABLE_ENTITY,
@@ -163,6 +163,15 @@ export class UsersController {
     return UsersController.listUsersToResponse(output);
   }
 
+  @ApiBearerAuth()
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'ID nao encontrado',
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Acesso nao autorizado',
+  })
   @UseGuards(AuthGuard)
   @Get(':id')
   async findOne(@Param('id') id: string) {
