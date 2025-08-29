@@ -46,7 +46,6 @@ describe('AuthService - unit tests', () => {
     const validToken = await sut.generateJwt('fakeId');
 
     const result = await sut.verifyJwt(validToken.accessToken);
-    console.log(result);
 
     expect(validToken).not.toBeNull();
 
